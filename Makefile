@@ -7,7 +7,7 @@ TARGET=messageboard-api-example
 
 all: build
 
-.PHONY: api test benchmark run image build
+.PHONY: api dep dep-update test benchmark run image build
 
 api:
 	docker run --rm \
@@ -15,6 +15,12 @@ api:
 	-i /local/resources/api/spec/v1/swagger.json \
 	-g go-server \
 	-o /local/pkg/openapi
+
+dep:
+	go mod init
+
+dep-update:
+	go mod tidy
 
 test:
 	$(GOTEST) -v -race -cover ./...
