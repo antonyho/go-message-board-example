@@ -1,0 +1,241 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "Message Board",
+        "description": "This is an example server for message board.",
+        "contact": {
+            "name": "Antony Ho",
+            "url": "https://antonyho.net/",
+            "email": "antony.h@riseup.net"
+        },
+        "license": {
+            "name": "MIT"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:{port}/{basePath}",
+            "description": "developer server",
+            "variables": {
+                "port": {
+                    "enum": ["8080"],
+                    "default": "8080"
+                },
+                "basePath": {
+                    "default": "v1"
+                }
+            }
+        }
+    ],
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
+            }
+        },
+        "schemas": {
+            "Message": {
+                "type": "object",
+                "required": ["text"],
+                "properties": {
+                    "id": {
+                        "description": "UUID v4",
+                        "type": "string",
+                        "example": "2C7BCEC7-CD14-D6E5-3FBF-F9551375429A"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "text": {
+                        "type": "string"
+                    },
+                    "creation_time": {
+                        "type": "string",
+                        "example": "2017-12-14T06:20:33-08:00"
+                    }
+                }
+            },
+            "Credential": {
+                "type": "object",
+                "required": ["login", "password"],
+                "properties": {
+                    "login": {
+                        "type": "string"
+                    },
+                    "password": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "responses": {
+            "UnauthorizedError": {
+                "description": "Access token is missing or invalid"
+            }
+        }
+    },
+    "paths": {
+        "/message": {
+            "post": {
+                "description": "post new message",
+                "operationId": "postMessage",
+                "requestBody": {
+                    "description": "post a new message to message board",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Message"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "new message posted"
+                    },
+                    "400": {
+                        "description": "wrong message format"
+                    }
+                }
+            }
+        },
+        "/message/{id}": {
+            "get": {
+                "description": "view a message",
+                "operationId": "viewMessage",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of an existing message",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "a single message of given ID",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Message"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "message not found"
+                    }
+                }
+            },
+            "put": {
+                "description": "edit a message",
+                "operationId": "editMessage",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of an existing message",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "post an updated message",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Message"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "202": {
+                        "description": "messasge updated"
+                    },
+                    "400": {
+                        "description": "wrong message format"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/UnauthorizedError"
+                    },
+                    "404": {
+                        "description": "message not found"
+                    }
+                }
+            }
+        },
+        "/messages": {
+            "get": {
+                "description": "list all messages on the board",
+                "operationId": "listMessages",
+                "responses": {
+                    "200": {
+                        "description": "list of all messages on the board",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Message"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/login": {
+            "post": {
+                "description": "login",
+                "operationId": "login",
+                "requestBody": {
+                    "description": "administrator login",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Credential"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "successful",
+                        "headers": {
+                            "Authorization": {
+                                "description": "JWT",
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid credential"
+                    }
+                }
+            }
+        }
+    }
+}
