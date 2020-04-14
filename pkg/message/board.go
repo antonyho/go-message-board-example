@@ -29,6 +29,13 @@ func (b *Board) Load(posts []*Post) {
 	}
 }
 
+// LoadOne a single post into message board
+// Assuming the post has proper UUID(v4)
+// Post with duplicated UUID will be overridden with the latter
+func (b *Board) LoadOne(post *Post) {
+	b.posts[post.ID] = post
+}
+
 // List all posts on message board
 func (b *Board) List() []*Post {
 	resp := make([]*Post, 0, len(b.posts))

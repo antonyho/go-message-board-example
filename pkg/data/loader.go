@@ -1,17 +1,33 @@
 package data
 
 import (
+	"encoding/csv"
+	"io"
+
 	"github.com/antonyho/go-message-board-example/pkg/message"
 	"github.com/gocarina/gocsv"
 )
 
-// Load CSV file content into message Post slice
-func Load(csvContent []byte) ([]*message.Post, error) {
-	posts := new([]*message.Post)
+// Loader is a line by line CSV loader
+type Loader struct {
+	unmarshaller *gocsv.Unmarshaller
+}
 
-	if err := gocsv.UnmarshalBytes(csvContent, posts); err != nil {
+// NewLoader instantiates a new Loader pointer to struct
+// A constructor function should not return error normally...
+func NewLoader(r io.Reader) (*Loader, error) {
+	umrshlr, err := gocsv.NewUnmarshaller(csv.NewReader(r), &message.Post{})
+	if err != nil {
 		return nil, err
 	}
+	return &Loader{unmarshaller: umrshlr}, nil
+}
 
-	return *posts, nil
+// ReadLine returns each next CSV row as Post
+func (l *Loader) ReadLine() (*message.Post, error) {
+	post, err := l.unmarshaller.Read()
+	if err != nil {
+		return nil, err
+	}
+	return post.(*message.Post), nil
 }

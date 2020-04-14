@@ -3,6 +3,7 @@ package auth
 import (
 	"errors"
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -25,15 +26,17 @@ type Authenticator interface {
 
 // Service is an authentication service for RESTful API
 type Service struct {
-	store     CredentialStore
-	jwtSecret []byte
+	store             CredentialStore
+	jwtSecret         []byte
+	tokenLifeDuration time.Duration
 }
 
 // NewDummyService is a dummy authentication service whichs purposes is for coding example
-func NewDummyService() Authenticator {
+func NewDummyService(tokenLifeDuration time.Duration) Authenticator {
 	return &Service{
-		store:     NewMockCredentialStore(),
-		jwtSecret: []byte("hardcoded_private_key"), // Hardcoded key only lives in coding example
+		store:             NewMockCredentialStore(),
+		jwtSecret:         []byte("hardcoded_private_key"), // Hardcoded key only lives in coding example
+		tokenLifeDuration: tokenLifeDuration,
 	}
 }
 
@@ -42,9 +45,11 @@ func NewDummyService() Authenticator {
 // Returns corresponding error if rejected
 func (s *Service) Grant(user, password string) (string, error) {
 	if s.store.Check(user, password) {
-		jwtLifetime := time.Now().Add(30 * time.Minute) // The JWT will only live 30 minutes
+		now := time.Now()
+		jwtLifetime := now.Add(s.tokenLifeDuration)
 		claims := jwt.MapClaims{
 			"username": user,
+			"iat":      now.Unix(),
 			"exp":      jwtLifetime.Unix(),
 		}
 
@@ -68,7 +73,14 @@ func (s *Service) Verify(tokenStr string) (bool, error) {
 		return s.jwtSecret, nil
 	})
 	if err != nil {
-		return false, err
+		if ve, ok := err.(*jwt.ValidationError); ok {
+			// Special handling for token expiry
+			if ve.Errors&jwt.ValidationErrorExpired != 0 {
+				return false, err
+			}
+		}
+		log.Printf("Token <%s> verification error %v\n", tokenStr, err)
+		return false, ErrUnauthorised
 	}
 
 	if _, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {

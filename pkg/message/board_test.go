@@ -1,7 +1,8 @@
 package message_test
 
 import (
-	"io/ioutil"
+	"io"
+	"os"
 	"testing"
 
 	"github.com/antonyho/go-message-board-example/pkg/data"
@@ -10,10 +11,17 @@ import (
 )
 
 func TestBoard(t *testing.T) {
-	csvData, err := ioutil.ReadFile("testdata/testfile.csv")
+	file, err := os.Open("testdata/testfile.csv")
 	assert.NoError(t, err)
-	posts, err := data.Load(csvData)
+	loader, err := data.NewLoader(file)
 	assert.NoError(t, err)
+	posts := make([]*message.Post, 0, 0)
+	for post, err := loader.ReadLine(); err != io.EOF; post, err = loader.ReadLine() {
+		if err != nil {
+			assert.Fail(t, err.Error())
+		}
+		posts = append(posts, post)
+	}
 
 	board := message.NewBoard()
 	board.Load(posts)

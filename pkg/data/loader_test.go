@@ -1,7 +1,8 @@
 package data
 
 import (
-	"io/ioutil"
+	"io"
+	"os"
 	"testing"
 	"time"
 
@@ -9,11 +10,19 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestLoad(t *testing.T) {
-	data, err := ioutil.ReadFile("testdata/testfile.csv")
+func TestLoader(t *testing.T) {
+	file, err := os.Open("testdata/testfile.csv")
 	assert.NoError(t, err)
-	posts, err := Load(data)
+	loader, err := NewLoader(file)
 	assert.NoError(t, err)
+	posts := make([]*message.Post, 0, 0)
+	for post, err := loader.ReadLine(); err != io.EOF; post, err = loader.ReadLine() {
+		if err != nil {
+			assert.Fail(t, err.Error())
+		}
+		posts = append(posts, post)
+	}
+
 	assert.Len(t, posts, 5)
 	expectedFifthPostTime, _ := time.Parse(time.RFC3339, "2019-01-22T21:36:21-08:00")
 	expectedFifthPost := &message.Post{
