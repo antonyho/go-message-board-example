@@ -11,19 +11,49 @@
 package main
 
 import (
+	"io"
 	"log"
 	"net/http"
+	"os"
+	"time"
 
+	"github.com/antonyho/go-message-board-example/pkg/auth"
+	"github.com/antonyho/go-message-board-example/pkg/data"
+	"github.com/antonyho/go-message-board-example/pkg/message"
 	openapi "github.com/antonyho/go-message-board-example/pkg/openapi/go"
 )
 
 func main() {
 	log.Printf("Server started")
 
-	DefaultApiService := openapi.NewDefaultApiService()
-	DefaultApiController := openapi.NewDefaultApiController(DefaultApiService)
+	loginSessionDuration := 30 * time.Minute
+	authServer := auth.NewDummyService(loginSessionDuration)
+	msgBoard := message.NewBoard()
+
+	loadInitData(msgBoard)
+
+	DefaultApiService := openapi.NewDefaultApiService(authServer, msgBoard)
+	DefaultApiController := openapi.NewDefaultApiController(authServer, DefaultApiService)
 
 	router := openapi.NewRouter(DefaultApiController)
 
 	log.Fatal(http.ListenAndServe(":8080", router))
+}
+
+func loadInitData(msgBoard *message.Board) {
+	initialDataFile, err := os.Open("resources/initdata/2019-07-23 - back_coding_challenge_messages.csv")
+	if err != nil {
+		log.Fatalf("Error opening initial data file %v\n", err)
+	}
+	defer initialDataFile.Close()
+	dataLoader, err := data.NewLoader(initialDataFile)
+	if err != nil {
+		log.Fatalf("Error reading headers from initial data file %v\n", err)
+	}
+	for post, err := dataLoader.ReadLine(); err != io.EOF; post, err = dataLoader.ReadLine() {
+		if err != nil {
+			log.Fatalf("Error loading initial post from data file %v\n", err)
+		}
+		msgBoard.LoadOne(post)
+	}
 }

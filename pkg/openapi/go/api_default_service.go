@@ -11,51 +11,77 @@
 package openapi
 
 import (
-	"errors"
+	"time"
+
+	"github.com/antonyho/go-message-board-example/pkg/auth"
+	"github.com/antonyho/go-message-board-example/pkg/message"
 )
 
 // DefaultApiService is a service that implents the logic for the DefaultApiServicer
-// This service should implement the business logic for every endpoint for the DefaultApi API. 
+// This service should implement the business logic for every endpoint for the DefaultApi API.
 // Include any external packages or services that will be required by this service.
 type DefaultApiService struct {
+	authService auth.Authenticator
+	msgBoard    *message.Board
 }
 
 // NewDefaultApiService creates a default api service
-func NewDefaultApiService() DefaultApiServicer {
-	return &DefaultApiService{}
+func NewDefaultApiService(authService auth.Authenticator, msgBoard *message.Board) DefaultApiServicer {
+	return &DefaultApiService{
+		authService: authService,
+		msgBoard:    msgBoard,
+	}
 }
 
-// EditMessage - 
+// EditMessage -
 func (s *DefaultApiService) EditMessage(id string, message Message) (interface{}, error) {
-	// TODO - update EditMessage with the required logic for this service method.
-	// Add api_default_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-	return nil, errors.New("service method 'EditMessage' not implemented")
+	err := s.msgBoard.Update(id, message.Text)
+	return nil, err
 }
 
-// ListMessages - 
+// ListMessages -
 func (s *DefaultApiService) ListMessages() (interface{}, error) {
-	// TODO - update ListMessages with the required logic for this service method.
-	// Add api_default_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-	return nil, errors.New("service method 'ListMessages' not implemented")
+	posts := s.msgBoard.List()
+	resp := make([]Message, len(posts))
+	// Actually both structs have the same JSON structures
+	for idx, post := range posts {
+		resp[idx] = Message{
+			Id:           post.ID,
+			Name:         post.Name,
+			Email:        post.Email,
+			Text:         post.Text,
+			CreationTime: post.CreationTime.Format(time.RFC3339),
+		}
+	}
+	return resp, nil
 }
 
-// Login - 
+// Login -
 func (s *DefaultApiService) Login(credential Credential) (interface{}, error) {
-	// TODO - update Login with the required logic for this service method.
-	// Add api_default_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-	return nil, errors.New("service method 'Login' not implemented")
+	token, err := s.authService.Grant(credential.Login, credential.Password)
+	if err != nil {
+		return nil, err
+	}
+	return token, nil
 }
 
-// PostMessage - 
+// PostMessage -
 func (s *DefaultApiService) PostMessage(message Message) (interface{}, error) {
-	// TODO - update PostMessage with the required logic for this service method.
-	// Add api_default_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-	return nil, errors.New("service method 'PostMessage' not implemented")
+	s.msgBoard.Paste(message.Text, message.Name, message.Email)
+	return nil, nil
 }
 
-// ViewMessage - 
+// ViewMessage -
 func (s *DefaultApiService) ViewMessage(id string) (interface{}, error) {
-	// TODO - update ViewMessage with the required logic for this service method.
-	// Add api_default_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-	return nil, errors.New("service method 'ViewMessage' not implemented")
+	post, err := s.msgBoard.View(id)
+	if err != nil {
+		return nil, err
+	}
+	return Message{
+		Id:           post.ID,
+		Name:         post.Name,
+		Email:        post.Email,
+		Text:         post.Text,
+		CreationTime: post.CreationTime.Format(time.RFC3339),
+	}, nil
 }

@@ -15,22 +15,28 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/antonyho/go-message-board-example/pkg/auth"
+	msg "github.com/antonyho/go-message-board-example/pkg/message"
 	"github.com/gorilla/mux"
 )
 
 // A DefaultApiController binds http requests to an api service and writes the service results to the http response
 type DefaultApiController struct {
-	service DefaultApiServicer
+	authService auth.Authenticator
+	service     DefaultApiServicer
 }
 
 // NewDefaultApiController creates a default api controller
-func NewDefaultApiController(s DefaultApiServicer) Router {
-	return &DefaultApiController{ service: s }
+func NewDefaultApiController(as auth.Authenticator, s DefaultApiServicer) Router {
+	return &DefaultApiController{
+		authService: as,
+		service:     s,
+	}
 }
 
 // Routes returns all of the api route for the DefaultApiController
 func (c *DefaultApiController) Routes() Routes {
-	return Routes{ 
+	return Routes{
 		{
 			"EditMessage",
 			strings.ToUpper("Put"),
@@ -64,79 +70,113 @@ func (c *DefaultApiController) Routes() Routes {
 	}
 }
 
-// EditMessage - 
-func (c *DefaultApiController) EditMessage(w http.ResponseWriter, r *http.Request) { 
+// EditMessage -
+func (c *DefaultApiController) EditMessage(w http.ResponseWriter, r *http.Request) {
+	// Authenticate user
+	authHeader := r.Header.Get("Authorization")
+	token := strings.TrimPrefix(authHeader, "Bearer ")
+	granted, err := c.authService.Verify(token)
+	if err != nil {
+		switch err {
+		case auth.ErrUnauthorised:
+			w.WriteHeader(http.StatusUnauthorized)
+		default:
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+		return
+	}
+	if !granted {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
 	params := mux.Vars(r)
 	id := params["id"]
 	message := &Message{}
 	if err := json.NewDecoder(r.Body).Decode(&message); err != nil {
-		w.WriteHeader(500)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	
+
 	result, err := c.service.EditMessage(id, *message)
 	if err != nil {
-		w.WriteHeader(500)
+		if err == msg.ErrPostNotExist {
+			w.WriteHeader(http.StatusNotFound)
+		} else {
+			w.WriteHeader(500)
+		}
+
 		return
 	}
-	
-	EncodeJSONResponse(result, nil, w)
+
+	respStatus := http.StatusAccepted
+	EncodeJSONResponse(result, &respStatus, w)
 }
 
-// ListMessages - 
-func (c *DefaultApiController) ListMessages(w http.ResponseWriter, r *http.Request) { 
+// ListMessages -
+func (c *DefaultApiController) ListMessages(w http.ResponseWriter, r *http.Request) {
 	result, err := c.service.ListMessages()
 	if err != nil {
 		w.WriteHeader(500)
 		return
 	}
-	
+
 	EncodeJSONResponse(result, nil, w)
 }
 
-// Login - 
-func (c *DefaultApiController) Login(w http.ResponseWriter, r *http.Request) { 
+// Login -
+func (c *DefaultApiController) Login(w http.ResponseWriter, r *http.Request) {
 	credential := &Credential{}
 	if err := json.NewDecoder(r.Body).Decode(&credential); err != nil {
-		w.WriteHeader(500)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	
+
 	result, err := c.service.Login(*credential)
 	if err != nil {
-		w.WriteHeader(500)
+		if err == auth.ErrUnauthorised {
+			w.WriteHeader(http.StatusBadRequest)
+		} else {
+			w.WriteHeader(500)
+		}
+
 		return
 	}
-	
+
 	EncodeJSONResponse(result, nil, w)
 }
 
-// PostMessage - 
-func (c *DefaultApiController) PostMessage(w http.ResponseWriter, r *http.Request) { 
+// PostMessage -
+func (c *DefaultApiController) PostMessage(w http.ResponseWriter, r *http.Request) {
 	message := &Message{}
 	if err := json.NewDecoder(r.Body).Decode(&message); err != nil {
 		w.WriteHeader(500)
 		return
 	}
-	
+
 	result, err := c.service.PostMessage(*message)
 	if err != nil {
 		w.WriteHeader(500)
 		return
 	}
-	
+
 	EncodeJSONResponse(result, nil, w)
 }
 
-// ViewMessage - 
-func (c *DefaultApiController) ViewMessage(w http.ResponseWriter, r *http.Request) { 
+// ViewMessage -
+func (c *DefaultApiController) ViewMessage(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	id := params["id"]
 	result, err := c.service.ViewMessage(id)
 	if err != nil {
-		w.WriteHeader(500)
+		if err == msg.ErrPostNotExist {
+			w.WriteHeader(http.StatusNotFound)
+		} else {
+			w.WriteHeader(500)
+		}
+
 		return
 	}
-	
+
 	EncodeJSONResponse(result, nil, w)
 }
