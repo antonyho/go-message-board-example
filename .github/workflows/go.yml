@@ -30,5 +30,8 @@ jobs:
             dep ensure
         fi
 
+    - name: Test
+      run: go test -v -race -cover ./...
+
     - name: Build
       run: go build -v -installsuffix cgo ./cmd/restserver
