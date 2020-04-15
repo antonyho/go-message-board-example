@@ -9,5 +9,6 @@ RUN make
 
 FROM scratch AS runtime
 COPY --from=build /go/src/github.com/antonyho/go-message-board-example/messageboard-api-example /go/bin/
+COPY --from=build /go/src/github.com/antonyho/go-message-board-example/resources/initdata resources/initdata
 EXPOSE 8080/tcp
 ENTRYPOINT ["/go/bin/messageboard-api-example"]

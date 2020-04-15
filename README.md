@@ -12,10 +12,12 @@ By using the [OpenAPI-Spec](https://github.com/OAI/OpenAPI-Specification) from a
 ### Assumptions
 - This project is assumed to be built under BASH environment.
 - The public API part has no authentication and no rate controller. Therefore, it is vulnerable to DDoS attack and any kind of overflow attack.
-- The user authentication and ACL security part is weak. Basically, at least JWT should be applied. This is a little bit big for a coding challenge demo, but can be a stretch goal.
+- The user authentication and ACL security part is weak. ~~Basically, at least JWT should be applied. This is a little bit big for a coding challenge demo, but can be a stretch goal.~~
 - JWT shall never be used on HTTP protocol without encryption. Otherwise, the plaintext JWT will be exposed and will be used for reply attack. But this demo is not going to have a SSL certificate.
 - This project can be splitted into several microservices. However, to keep it as a small coding challenge demo again.
 - Data Loader, and Authentication Service could both be standalone microservices. 
+- Moderator login session has 30 minutes. After that, a new login is required. Not token refresh API is implemented yet.
+- I have misread the requirement. The PostMessage API endpoint is redundant. The endpoint and related functions ought to be totally removed in a real life project, as it is not part of the requested feature.
 
 ### Running the server
 To run the server, follow these simple steps:
