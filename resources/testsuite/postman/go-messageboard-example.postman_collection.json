@@ -1,0 +1,250 @@
+{
+	"info": {
+		"_postman_id": "6fef3f1e-57b4-40ca-865d-5c15baec708b",
+		"name": "go-messageboard-example",
+		"description": "Test Collection for Go RESTful API Message Board Server Example Project with OpenAPI Specification\n\nProject URL: https://github.com/antonyho/go-message-board-example\n\nThis collection is supposed to be used for testing on local environment. Use Docker to build and run the container.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "List all messages",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/v1/messages",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"messages"
+					]
+				},
+				"description": "List all messages on the bulletin board"
+			},
+			"response": []
+		},
+		{
+			"name": "View message by ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/v1/message/0F167374-C447-2019-2A32-93D01D9A4F9D",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"message",
+						"0F167374-C447-2019-2A32-93D01D9A4F9D"
+					]
+				},
+				"description": "List all messages on the bulletin board"
+			},
+			"response": []
+		},
+		{
+			"name": "View message by Wrong ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/v1/message/wrong-uuid",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"message",
+						"wrong-uuid"
+					]
+				},
+				"description": "List all messages on the bulletin board"
+			},
+			"response": []
+		},
+		{
+			"name": "Login as admin",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"login\": \"admin\",\n\t\"password\": \"back-challenge\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/v1/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login with incorrect credential",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"login\": \"admin\",\n\t\"password\": \"wrong-password\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/v1/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update message",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1ODY5MDg5MTEsImlhdCI6MTU4NjkwNzExMSwidXNlcm5hbWUiOiJhZG1pbiJ9.pcAnDCIxv35eswR7n6d58kMC-Dbcms12bjxXyWfLR18",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"Text\": \"Modified Message\"\n}",
+					"options": {
+						"raw": {
+							"language": "javascript"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/v1/message/0F167374-C447-2019-2A32-93D01D9A4F9D",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"message",
+						"0F167374-C447-2019-2A32-93D01D9A4F9D"
+					]
+				},
+				"description": "Please login with admin first.\nUse the token from login response.\nPut the token to the Bear Authentication header."
+			},
+			"response": []
+		},
+		{
+			"name": "Update message by Wrong ID",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1ODY5MDg5MTEsImlhdCI6MTU4NjkwNzExMSwidXNlcm5hbWUiOiJhZG1pbiJ9.pcAnDCIxv35eswR7n6d58kMC-Dbcms12bjxXyWfLR18",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"Text\": \"Modified Message\"\n}",
+					"options": {
+						"raw": {
+							"language": "javascript"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/v1/message/wrong-uuid",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"message",
+						"wrong-uuid"
+					]
+				},
+				"description": "Please login with admin first.\nUse the token from login response.\nPut the token to the Bear Authentication header."
+			},
+			"response": []
+		},
+		{
+			"name": "Update message without token",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"Text\": \"Modified Message\"\n}",
+					"options": {
+						"raw": {
+							"language": "javascript"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/v1/message/0F167374-C447-2019-2A32-93D01D9A4F9D",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"message",
+						"0F167374-C447-2019-2A32-93D01D9A4F9D"
+					]
+				},
+				"description": "Please login with admin first.\nUse the token from login response.\nPut the token to the Bear Authentication header."
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
