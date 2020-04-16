@@ -115,6 +115,24 @@ func (c *DefaultApiController) EditMessage(w http.ResponseWriter, r *http.Reques
 
 // ListMessages -
 func (c *DefaultApiController) ListMessages(w http.ResponseWriter, r *http.Request) {
+	// Authenticate user
+	authHeader := r.Header.Get("Authorization")
+	token := strings.TrimPrefix(authHeader, "Bearer ")
+	granted, err := c.authService.Verify(token)
+	if err != nil {
+		switch err {
+		case auth.ErrUnauthorised:
+			w.WriteHeader(http.StatusUnauthorized)
+		default:
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+		return
+	}
+	if !granted {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
 	result, err := c.service.ListMessages()
 	if err != nil {
 		w.WriteHeader(500)
@@ -165,6 +183,24 @@ func (c *DefaultApiController) PostMessage(w http.ResponseWriter, r *http.Reques
 
 // ViewMessage -
 func (c *DefaultApiController) ViewMessage(w http.ResponseWriter, r *http.Request) {
+	// Authenticate user
+	authHeader := r.Header.Get("Authorization")
+	token := strings.TrimPrefix(authHeader, "Bearer ")
+	granted, err := c.authService.Verify(token)
+	if err != nil {
+		switch err {
+		case auth.ErrUnauthorised:
+			w.WriteHeader(http.StatusUnauthorized)
+		default:
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+		return
+	}
+	if !granted {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
 	params := mux.Vars(r)
 	id := params["id"]
 	result, err := c.service.ViewMessage(id)

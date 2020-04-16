@@ -18,9 +18,15 @@ By using the [OpenAPI-Spec](https://github.com/OAI/OpenAPI-Specification) from a
 - Data Loader, and Authentication Service could both be standalone microservices. 
 - Moderator login session has 30 minutes. After that, a new login is required. Not token refresh API is implemented yet.
 - I have misread the requirement. The PostMessage API endpoint is redundant. The endpoint and related functions ought to be totally removed in a real life project, as it is not part of the requested feature.
+- Assuming the initial data CSV file can be huge. The I/O of the CSV loader is by `readline` method. So the loader will not overflow your memory if you provide a 10TB CSV data. But of course, I am not using any persistent layer as database. A 10TB data file loading into the `map[string]interface{}` will absolutely cause your server out of memory.
+
+### Notes
+- This project is using GitHub Actions for CI/CD Pipeline.
+- The Docker Image can be found on Docker Hub.
+- The deployment is based on `testing-release` branch.
 
 ### Running the server
-To run the server, follow these simple steps:
+To run the server on your local system, follow these simple steps:
 
 ```
 make run
@@ -35,3 +41,6 @@ Once image is built use
 ```
 docker run --rm -it -p 127.0.0.1:8080:8080 antonyho-messageboard-api-example
 ```
+
+### Testing
+Postman test suite is included in the project.

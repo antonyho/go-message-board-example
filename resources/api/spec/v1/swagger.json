@@ -110,6 +110,11 @@
             "get": {
                 "description": "view a message",
                 "operationId": "viewMessage",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
                 "parameters": [
                     {
                         "name": "id",
@@ -131,6 +136,9 @@
                                 }
                             }
                         }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/UnauthorizedError"
                     },
                     "404": {
                         "description": "message not found"
@@ -187,6 +195,11 @@
             "get": {
                 "description": "list all messages on the board",
                 "operationId": "listMessages",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "list of all messages on the board",
@@ -200,6 +213,9 @@
                                 }
                             }
                         }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/UnauthorizedError"
                     }
                 }
             }
