@@ -18,7 +18,6 @@ The HTML format of API document can be founded at: [API Doc](https://github.com/
 - This project can be splitted into several microservices. However, to keep it as a small coding challenge demo again.
 - Data Loader, and Authentication Service could both be standalone microservices. 
 - Moderator login session has 30 minutes. After that, a new login is required. Not token refresh API is implemented yet.
-- I have misread the requirement. The PostMessage API endpoint is redundant. The endpoint and related functions ought to be totally removed in a real life project, as it is not part of the requested feature.
 - Assuming the initial data CSV file can be huge. The I/O of the CSV loader is by `readline` method. So the loader will not overflow your memory if you provide a 10TB CSV data. But of course, I am not using any persistent layer as database. A 10TB data file loading into the `map[string]interface{}` will absolutely cause your server out of memory.
 
 ### Notes
