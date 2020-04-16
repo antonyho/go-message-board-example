@@ -16,6 +16,13 @@ api:
 	-g go-server \
 	-o /local/pkg/openapi
 
+api-doc:
+	docker run --rm \
+	-v $(PWD):/local openapitools/openapi-generator-cli generate \
+	-i /local/resources/api/spec/v1/swagger.json \
+	-g html \
+	-o /local/resources/api/doc
+
 dep:
 	go mod init
 
