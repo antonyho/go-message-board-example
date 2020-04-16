@@ -56,8 +56,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Message'
           description: a single message of given ID
+        "401":
+          description: Access token is missing or invalid
         "404":
           description: message not found
+      security:
+      - bearerAuth: []
     put:
       description: edit a message
       operationId: editMessage
@@ -101,6 +105,10 @@ paths:
                   $ref: '#/components/schemas/Message'
                 type: array
           description: list of all messages on the board
+        "401":
+          description: Access token is missing or invalid
+      security:
+      - bearerAuth: []
   /login:
     post:
       description: login
