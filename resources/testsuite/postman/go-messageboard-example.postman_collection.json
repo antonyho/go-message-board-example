@@ -9,6 +9,16 @@
 		{
 			"name": "List all messages",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1ODcwMDU5MTksImlhdCI6MTU4NzAwNDExOSwidXNlcm5hbWUiOiJhZG1pbiJ9.W3vegBl5ddoGFnoF7vim5xfbfVUU7aurV23QK7A0lSE",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"url": {
@@ -30,6 +40,16 @@
 		{
 			"name": "View message by ID",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1ODcwMDU5MTksImlhdCI6MTU4NzAwNDExOSwidXNlcm5hbWUiOiJhZG1pbiJ9.W3vegBl5ddoGFnoF7vim5xfbfVUU7aurV23QK7A0lSE",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"url": {
@@ -167,6 +187,38 @@
 					]
 				},
 				"description": "Please login with admin first.\nUse the token from login response.\nPut the token to the Bear Authentication header."
+			},
+			"response": []
+		},
+		{
+			"name": "Create new message",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"Name\": \"Antony Ho\",\n\t\"Email\": \"no-contact@email.com\",\n\t\"Text\": \"Modified Message\"\n}",
+					"options": {
+						"raw": {
+							"language": "javascript"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/v1/message",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"message"
+					]
+				}
 			},
 			"response": []
 		},
