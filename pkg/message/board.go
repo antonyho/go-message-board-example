@@ -25,7 +25,7 @@ func NewBoard() *Board {
 // Post with duplicated UUID will be overridden with the latter
 func (b *Board) Load(posts []*Post) {
 	for _, p := range posts {
-		b.posts[p.ID] = p
+		b.posts[p.id] = p
 	}
 }
 
@@ -33,7 +33,7 @@ func (b *Board) Load(posts []*Post) {
 // Assuming the post has proper UUID(v4)
 // Post with duplicated UUID will be overridden with the latter
 func (b *Board) LoadOne(post *Post) {
-	b.posts[post.ID] = post
+	b.posts[post.id] = post
 }
 
 // List all posts on message board
@@ -43,7 +43,7 @@ func (b *Board) List() []*Post {
 		resp = append(resp, p)
 	}
 
-	sort.Slice(resp, func(i, j int) bool { return resp[i].CreationTime.After(resp[j].CreationTime) })
+	sort.Slice(resp, func(i, j int) bool { return resp[i].creationTime.After(resp[j].creationTime) })
 
 	return resp
 }
@@ -61,7 +61,7 @@ func (b *Board) View(id string) (*Post, error) {
 // Paste a new message to the board
 func (b *Board) Paste(message, poster, email string) {
 	newPost := NewPost(poster, email, message)
-	b.posts[newPost.ID] = newPost
+	b.posts[newPost.id] = newPost
 }
 
 // Update an existing post for given ID
@@ -72,7 +72,7 @@ func (b *Board) Update(id, content string) error {
 		return ErrPostNotExist
 	}
 
-	p.Text = content
+	p.Update(content)
 
 	return nil
 }

@@ -25,12 +25,12 @@ func TestLoader(t *testing.T) {
 
 	assert.Len(t, posts, 5)
 	expectedFifthPostTime, _ := time.Parse(time.RFC3339, "2019-01-22T21:36:21-08:00")
-	expectedFifthPost := &message.Post{
-		ID:           "AF380451-7EE5-3867-02C1-9D2ACC4259A2",
-		Name:         "Lawrence Alston",
-		Email:        "rutrum.eu.ultrices@at.org",
-		Text:         "est. Mauris eu turpis. Nulla aliquet. Proin velit.",
-		CreationTime: expectedFifthPostTime,
-	}
+	expectedFifthPost := message.Load(
+		"AF380451-7EE5-3867-02C1-9D2ACC4259A2",
+		"Lawrence Alston",
+		"rutrum.eu.ultrices@at.org",
+		"est. Mauris eu turpis. Nulla aliquet. Proin velit.",
+		expectedFifthPostTime,
+	)
 	assert.Equal(t, expectedFifthPost, posts[4])
 }

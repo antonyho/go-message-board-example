@@ -46,11 +46,11 @@ func (s *DefaultApiService) ListMessages() (interface{}, error) {
 	// Actually both structs have the same JSON structures
 	for idx, post := range posts {
 		resp[idx] = Message{
-			Id:           post.ID,
-			Name:         post.Name,
-			Email:        post.Email,
-			Text:         post.Text,
-			CreationTime: post.CreationTime.Format(time.RFC3339),
+			Id:           post.ID(),
+			Name:         post.Name(),
+			Email:        post.Email(),
+			Text:         post.Text(),
+			CreationTime: post.CreationTime().Format(time.RFC3339),
 		}
 	}
 	return resp, nil
@@ -78,10 +78,10 @@ func (s *DefaultApiService) ViewMessage(id string) (interface{}, error) {
 		return nil, err
 	}
 	return Message{
-		Id:           post.ID,
-		Name:         post.Name,
-		Email:        post.Email,
-		Text:         post.Text,
-		CreationTime: post.CreationTime.Format(time.RFC3339),
+		Id:           post.ID(),
+		Name:         post.Name(),
+		Email:        post.Email(),
+		Text:         post.Text(),
+		CreationTime: post.CreationTime().Format(time.RFC3339),
 	}, nil
 }
